@@ -1,16 +1,9 @@
 const { Sequelize } = require('sequelize');
 
-function ConnectPostgres(env) {
-    var connectionString = `postgres://${env.DB_USER}:${env.DB_PASS}@${env.DB_HOST}:${env.DB_PORT}/${env.DB_NAME}`
+var connectionString = `postgres://${process.env.DB_USER}:${process.env.DB_PASS}@${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_NAME}`
 
-    const sequelize = new Sequelize(connectionString)
+const sequelize = new Sequelize(connectionString)
 
-    try {
-        sequelize.authenticate();
-        console.log('Connection has been established successfully.');
-      } catch (error) {
-        console.error('Unable to connect to the database:', error);
-      }   
-}
+const db = sequelize
 
-module.exports = ConnectPostgres;
+module.exports = db;
