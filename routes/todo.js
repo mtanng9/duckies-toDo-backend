@@ -1,25 +1,73 @@
 var express = require('express');
+const Todo = require('../models/todo');
 var router = express.Router();
 
 /* GET users listing. */
-router.get('/', function(req, res, next) {
-  res.send('Get all todos');
+router.get('/', async function(req, res, next) {
+  var todos = await Todo.findAll()
+  res.json(todos)
 });
 
-router.get('/:id', function(req, res, next) {
-  res.send('Get route with id of: ' + req.params.id);
+router.get('/:id', async function(req, res, next) {
+  var id = req.params.id
+  var todo = await Todo.findAll({
+    where: {
+      id: id
+    }
+  })
+
+  res.json(todo)
 });
 
-router.post('/', function(req, res, next) {
-  res.send('You create a todo');
+router.get('/today', async function(req, res, next) {
+});
+
+router.get('/upcoming', async function(req, res, next) {
+});
+
+router.get('/pastDue', async function(req, res, next) {
+});
+
+router.get('completed', async function(req, res, next) {
+});
+
+
+router.post('/', async function(req, res, next) {
+  var body = req.body
+  var todo = await Todo.create({
+    task: body.task,
+    complete: body.complete,
+    dueDate: body.dueDate
+  })
+  res.json(todo.id)
 })
 
-router.put('/:id', function(req, res, next) {
-  res.send('You updated a todo with id of: ' + req.params.id);
+router.put('/:id', async function(req, res, next) {
+  var id = req.params.id
+  var body = req.body
+  var rows = await Todo.update(
+    {
+      task: body.task,
+      complete: body.complete,
+      dueDate: body.dueDate
+    },
+    {
+      where: {
+        id: id
+      }
+    })
+
+    res.json(rows)
 })
 
-router.delete('/:id', function(req, res, next) {
-  res.send('You deleted a todo with the id of: ' + req.params.id)
+router.delete('/:id', async function(req, res, next) {
+  var id = req.params.id
+  var rows = await Todo.destroy({
+    where: {
+      id: id
+    }
+  })
+  res.json(rows)
 })
 
 module.exports = router;
