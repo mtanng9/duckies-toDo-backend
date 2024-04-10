@@ -7,6 +7,7 @@ var logger = require('morgan');
 var todosRouter = require('./routes/todo');
 const db = require('./store/postgres');
 const Todo = require('./models/todo');
+const CreateJSONError = require('./utils/error');
 
 try { 
   db.authenticate();
@@ -38,9 +39,9 @@ app.use(function(err, req, res, next) {
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
 
-  // render the error page
+  // send the error json
   res.status(err.status || 500);
-  res.render('error');
+  res.json(CreateJSONError(err.status || 500, err.message));
 });
 
 module.exports = app;
