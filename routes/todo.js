@@ -1,7 +1,8 @@
 var express = require('express');
 const Todo = require('../models/todo');
 const { Op } = require('sequelize');
-const CreateJSONError = require('../utils/error');
+const TodoSchema = require('../schema/todoSchema');
+const TodoValidator = require('../schema/validator');
 var router = express.Router();
 
 /* GET users listing. */
@@ -110,15 +111,20 @@ router.get('/:id', async function(req, res, next) {
 router.post('/', async function(req, res, next) {
   try {
     var body = req.body
-    var todo = await Todo.create({
-      // create row in db (async) -> (promise)
-      // reads row back (async) <- (promise)
-      // cast data to instance of model object (object, err)
-      task: body.task,
-      complete: body.complete,
-      dueDate: body.dueDate
-    })
-    res.json(todo.id)
+    var result = TodoSchema.validate(body)
+    if (result.error != null) {
+        next(result.error)
+    } else {
+      var todo = await Todo.create({
+        // create row in db (async) -> (promise)
+        // reads row back (async) <- (promise)
+        // cast data to instance of model object (object, err)
+        task: body.task,
+        complete: body.complete,
+        dueDate: body.dueDate
+      })
+      res.json(todo.id)
+    }
   } catch(err) {
     next(err)
   }
@@ -128,6 +134,10 @@ router.put('/:id', async function(req, res, next) {
   try {
     var id = req.params.id
     var body = req.body
+    var result = TodoSchema.validate(body)
+    if (result.error != null) {
+      next(result.error)
+  } else {
     var rows = await Todo.update(
       {
         task: body.task,
@@ -141,6 +151,7 @@ router.put('/:id', async function(req, res, next) {
       })
   
       res.json(rows)
+  }
   } catch (err) {
     res.json(next(err))
   }
